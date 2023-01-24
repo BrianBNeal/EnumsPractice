@@ -1,66 +1,125 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System.Text;
 
 namespace EnumsPractice;
 
-/*
- *   1. Greet
- *   2. Calculate
- *   3. Exit
- * 
- *   Menu Option: 
- */
 public class MainMenu
 {
-    private enum MenuOption
+    private enum MenuOption //keep Exit last, add new options in desired order
     {
-        Calculate,
+        None = 0,
         Greet,
-        None,
-        Other,
+        Calculate,
         Weather,
+        Insult,
+        Joke,
         Exit,
     }
-    private bool _running;
-
-    public void Show()
+    
+    //ADVANCED TIP: use #region to create a region that can be easily collapsed/expanded
+#region Constructors
+    public MainMenu() //TIP: use the constructor to set initial values
     {
         _running = true;
+        _currentOption = MenuOption.None;
+    }
+
+#endregion
+
+
+#region Fields
+    
+    private bool _running;
+    private MenuOption _currentOption;
+
+#endregion
+
+#region Methods
+    public void Show()
+    {
         while (_running)
         {
-            MenuOption currentOption = MenuOption.None;
+            ShowMenu();
+            GetInput();
+            ExecuteInput();
 
-            Console.Clear();
-            string menuText = GetMenuAsText();
-            Console.Write(menuText);
-
-            string input = Console.ReadLine();
-            MenuOption chosenOption = (MenuOption)int.Parse(input); //cast - to change the Type of an object (MenuOption)
-
-            switch (chosenOption)
-            {
-                case MenuOption.Weather:
-                    GetWeather();
-                    break;
-                case MenuOption.Calculate:
-                    Calculate();
-                    break;
-                case MenuOption.Greet:
-                    Greet();
-                    break;
-                case MenuOption.Exit:
-                    Exit();
-                    break;
-                default:
-                    break;
-            }
+            
         }
     }
 
-    private string GetMenuAsText()
+    private void ExecuteInput()
+    {
+        switch (_currentOption) //use a switch to define different paths based on a single value
+        {
+            case MenuOption.Weather:
+                GetWeather();
+                break;
+            case MenuOption.Calculate:
+                Calculate();
+                break;
+            case MenuOption.Greet:
+                Greet();
+                break;
+            case MenuOption.Exit:
+                Exit();
+                break;
+            case MenuOption.Insult:
+                NotImplemented(MenuOption.Insult);
+                break;
+            case MenuOption.Joke:
+                NotImplemented(MenuOption.Joke);
+                break;
+            default:
+                break;
+        }
+    }
+
+    private void GetInput()
+    {
+        while (true)
+        {
+            string input = Console.ReadKey(true).KeyChar.ToString();//fancier input!
+            if (int.TryParse(input, out int numberPressed) && IsValidMenuOption(numberPressed))
+            {
+                _currentOption = (MenuOption)numberPressed; //cast - to change the Type of an object from one (int) to another (MenuOption)
+            }
+
+        }
+    }
+
+
+
+    /// <summary>
+    /// determines if the supplied number is within the count of the menu options
+    /// </summary>
+    /// <param name="inputAsInt"></param>
+    /// <returns>true if the value is within bounds, false if out of bounds</returns>
+    /// <exception cref="NotImplementedException"></exception>
+    private bool IsValidMenuOption(int inputAsInt)
+    {
+        throw new NotImplementedException();
+    }
+
+    private void ShowMenu()
+    {
+        Console.Clear();
+        string menuText = GetMenuAsText();
+        Console.Write(menuText);
+    }
+
+    private void NotImplemented(MenuOption insult)
+    {
+        Console.WriteLine($"The {Enum.GetName(insult)} feature is not yet implemented, sorry!");
+        Console.Write("Press enter to go back...");
+        Console.ReadLine();
+    }
+
+    //ADVANCED TIP: use three slashes like below and provide a summary that will appear when you hover over that method/class/property
+
+    /// <summary>
+    /// Creates a numbered menu based off the enum MenuOptions
+    /// </summary>
+    /// <returns>a string representation of the menu and prompt</returns>
+    private string GetMenuAsText() //hover your mouse cursor over GetMenuAsText() to the left of this comment, notice the description that appears with the text from above??
     {
         StringBuilder bldr = new StringBuilder();
 
@@ -103,6 +162,7 @@ public class MainMenu
         _running = false;
         Console.WriteLine("Exiting...");
         Console.ReadLine();
-        
+
     }
+#endregion
 }
